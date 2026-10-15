@@ -72,6 +72,7 @@
               </td>
               <td class="w-[130px] whitespace-nowrap text-center p-[6px_8px] border border-gray-200 bg-white align-middle">
                 <button 
+                  v-if="authStore.isAdmin"
                   @click="eliminarProducto(producto.id)" 
                   class="inline-block p-[4px_10px] font-semibold text-white tracking-[0.5px] rounded-[25px] border border-white/10 cursor-pointer transition-all duration-300 text-[11px] outline-none bg-red-600 shadow-[0_2px_8px_rgba(0,0,0,0.2),inset_0_1px_0_rgba(255,255,255,0.3)] hover:scale-[1.03] m-[0_2px]"
                 >
@@ -171,11 +172,13 @@
 
 <script setup>
 import { ref, onMounted, computed } from 'vue'
+import { useAuthStore } from '../stores/auth'
 import api from '../services/api'
 import offlineService from '../services/offline'
 import NavBar from '../components/NavBar.vue'
 import DynamicForm from '../components/DynamicForm.vue'
 
+const authStore = useAuthStore()
 const productos = ref([])
 const categorias = ref([])
 const proveedores = ref([])
