@@ -1,84 +1,52 @@
-import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
-import api from '../services/api'
+import { defineStore } from 'pinia';
+import api from '@/services/api';
 
-export const useAuthStore = defineStore('auth', () => {
-  const token = ref(localStorage.getItem('token') || null)
-  const user = ref(JSON.parse(localStorage.getItem('user')) || null)
-
-  const isAuthenticated = computed(() => !!token.value)
-
-  function setToken(newToken) {
-    token.value = newToken
-    if (newToken) {
-      localStorage.setItem('token', newToken)
-      api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`
-    } else {
-      localStorage.removeItem('token')
-      delete api.defaults.headers.common['Authorization']
-    }
-  }
-
-  function setUser(userData) {
-    user.value = userData
-    if (userData) {
-      localStorage.setItem('user', JSON.stringify(userData))
-    } else {
-      localStorage.removeItem('user')
-    }
-  }
-
-  async function login(credentials) {
-    try {
-      const response = await api.post('/login', credentials)
-      if (response.data.success) {
-        setToken(response.data.data.token)
-        setUser(response.data.data.user)
-        return { success: true }
+export const useAuthStore = defineStore('auth', {
+  state: () => ({
+    user: JSON.parse(localStorage.getItem('user')) || null,
+    token: localStorage.getItem('token') || null,
+  }),
+  getters: {
+    isAuthenticated: (state) => !!state.token,
+    isAdmin: (state) => state.user?.role === 'admin',
+    userName: (state) => state.user?.nombre || '',
+  },
+  actions: {
+    async login(credentials) {
+      const response = await api.post('/login', credentials);
+      const { user, token } = response.data.data;
+      this.token = token;
+      this.user = user;
+      localStorage.setItem('token', token);
+      localStorage.setItem('user', JSON.stringify(user));
+      return response.data;
+    },
+    async fetchUser() {
+      const response = await api.get('/me');
+      this.user = response.data.data;
+      localStorage.setItem('user', JSON.stringify(this.user));
+    },
+    logout() {
+      this.token = null;
+      this.user = null;
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+    },
+    setToken(token) {
+      this.token = token;
+      if (token) {
+        localStorage.setItem('token', token);
+      } else {
+        localStorage.removeItem('token');
       }
-    } catch (error) {
-      return {
-        success: false,
-        message: error.response?.data?.message || 'Error al iniciar sesión'
+    },
+    setUser(user) {
+      this.user = user;
+      if (user) {
+        localStorage.setItem('user', JSON.stringify(user));
+      } else {
+        localStorage.removeItem('user');
       }
-    }
-  }
-
-  async function fetchUser() {
-    if (!token.value) return
-    try {
-      const response = await api.get('/me')
-      if (response.data.success) {
-        setUser(response.data.data)
-      }
-    } catch (error) {
-      console.error('Error al obtener usuario:', error)
-      if (error.response?.status === 401) {
-        logout()
-      }
-    }
-  }
-
-  async function logout() {
-    try {
-      await api.post('/logout')
-    } catch (error) {
-      console.error('Error al cerrar sesión:', error)
-    } finally {
-      setToken(null)
-      setUser(null)
-    }
-  }
-
-  return {
-    token,
-    user,
-    isAuthenticated,
-    setToken,
-    setUser,
-    login,
-    logout,
-    fetchUser
-  }
-})
-
+    },
+  },
+});

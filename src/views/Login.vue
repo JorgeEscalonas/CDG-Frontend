@@ -38,11 +38,12 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, onMounted } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
 const router = useRouter()
+const route = useRoute()
 const authStore = useAuthStore()
 
 const form = ref({
@@ -53,6 +54,12 @@ const form = ref({
 const loading = ref(false)
 const error = ref('')
 
+onMounted(() => {
+  if (route.query.expired === '1') {
+    error.value = 'Tu sesión ha expirado. Por favor, inicia sesión nuevamente.'
+  }
+})
+
 const handleLogin = async () => {
   loading.value = true
   error.value = ''
@@ -60,12 +67,12 @@ const handleLogin = async () => {
   try {
     const result = await authStore.login(form.value)
     if (result.success) {
-      router.push({ name: 'Dashboard' })
+      router.push({ name: 'dashboard' })
     } else {
       error.value = result.message || 'Nombre de usuario o contraseña incorrectos.'
     }
   } catch (err) {
-    error.value = 'Ocurrió un error al intentar iniciar sesión.'
+    error.value = err.response?.data?.message || 'Ocurrió un error al intentar iniciar sesión.'
   } finally {
     loading.value = false
   }

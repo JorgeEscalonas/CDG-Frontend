@@ -72,12 +72,16 @@
               </div>
 
               <button
+                v-if="authStore.isAdmin"
                 type="submit"
                 class="w-full p-[12px] font-black text-white tracking-[0.5px] rounded-[15px] border border-white/10 cursor-pointer transition-all duration-300 text-[13px] outline-none bg-gradient-to-br from-[#b57e10] to-[#975f0c] shadow-[0_4px_12px_rgba(0,0,0,0.15),inset_0_1px_0_rgba(255,255,255,0.3)] hover:translate-y-[-2px] hover:shadow-[0_6px_15px_rgba(0,0,0,0.2)] disabled:opacity-50"
                 :disabled="loading"
               >
                 {{ loading ? 'Actualizando...' : 'confirmar cambio' }}
               </button>
+              <p v-else class="text-xs text-center text-gray-400 italic py-2">
+                Solo administradores pueden cambiar la tasa del dólar.
+              </p>
             </form>
           </div>
         </div>
@@ -151,10 +155,12 @@
 
 <script setup>
 import { ref, onMounted, watch, computed } from 'vue'
+import { useAuthStore } from '../stores/auth'
 import api from '../services/api'
 import offlineService from '../services/offline'
 import NavBar from '../components/NavBar.vue'
 
+const authStore = useAuthStore()
 const ultimoPrecio = ref(null)
 const historial = ref([])
 const precio = ref('')

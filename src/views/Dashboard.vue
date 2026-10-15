@@ -26,7 +26,7 @@
           :value="stats.totalProductos"
           :icon="icons.box"
           color="gold"
-          :to="{ name: 'Productos' }"
+          :to="{ name: 'productos' }"
           class="hover:scale-[1.02] transition-transform cursor-pointer"
         />
         <StatCard
@@ -34,7 +34,7 @@
           :value="stats.totalCategorias"
           :icon="icons.tag"
           color="green"
-          :to="{ name: 'Categorias' }"
+          :to="{ name: 'categorias' }"
           class="hover:scale-[1.02] transition-transform cursor-pointer"
         />
         <StatCard
@@ -42,7 +42,7 @@
           :value="stats.totalProveedores"
           :icon="icons.truck"
           color="green"
-          :to="{ name: 'Proveedores' }"
+          :to="{ name: 'proveedores' }"
           class="hover:scale-[1.02] transition-transform cursor-pointer"
         />
         <StatCard
@@ -50,7 +50,7 @@
           :value="ultimoPrecioDolar"
           :icon="icons.dollar"
           color="yellow"
-          :to="{ name: 'Dolar' }"
+          :to="{ name: 'dolar' }"
           class="hover:scale-[1.02] transition-transform cursor-pointer"
         />
       </div>

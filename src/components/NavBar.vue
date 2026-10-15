@@ -109,7 +109,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import { useAuthStore } from '../stores/auth'
 
@@ -133,19 +133,25 @@ const vClickOutside = {
   }
 }
 
-const menuItems = [
-  { name: 'productos', label: 'Productos', to: '/productos' },
-  { name: 'categorias', label: 'Categorías', to: '/categorias' },
-  { name: 'proveedores', label: 'Proveedores', to: '/proveedores' },
-  { name: 'dolar', label: 'Cambio Dólar', to: '/dolar' },
-]
+const menuItems = computed(() => {
+  const items = [
+    { name: 'productos', label: 'Productos', to: '/productos' },
+    { name: 'categorias', label: 'Categorías', to: '/categorias' },
+    { name: 'proveedores', label: 'Proveedores', to: '/proveedores' },
+    { name: 'dolar', label: 'Cambio Dólar', to: '/dolar' },
+  ]
+  if (authStore.isAdmin) {
+    items.push({ name: 'usuarios', label: 'Usuarios', to: '/usuarios' })
+  }
+  return items
+})
 
 const handleLogout = async () => {
   if (confirm('¿Deseas cerrar la sesión?')) {
     isUserMenuOpen.value = false
     isMenuOpen.value = false
     await authStore.logout()
-    router.push({ name: 'Login' })
+    router.push({ name: 'login' })
   }
 }
 </script>
